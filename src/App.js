@@ -1,87 +1,83 @@
 import { Redirect, Route, Switch } from 'react-router-dom';
-import './App.css';
+import './assets/css/App.css';
+import './assets/sass/animations.sass';
 import { AboutPage, MainPage } from './pages';
 import ReactScrollWheelHandler from 'react-scroll-wheel-handler';
+import removeAllHTMLStyles from './utils/removeAllStyles';
 import { useRef, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { goTo, setPage } from './redux/actions';
+import { useState } from 'react';
 
 function App() {
-  const fNum = useRef(null),
-    sNum = useRef(null),
-    pageBlock = useRef(null),
-    prevNumber = useRef(0);
-  const dispatch = useDispatch();
-
-  const globalState = useSelector(({ settings }) => {
-    return {
-      page: settings.page,
-      prev: settings.prev,
-      menuClick: settings.menuClick,
-    };
-  });
-
-  console.log('global', globalState);
+  const firstFrontNumberRef = useRef(null),
+    secondFrontNumberRef = useRef(null),
+    homePageMovingBlock = useRef(null),
+    [pageSettings, setPageSettings] = useState({
+      current: 1,
+      prev: 0,
+      isMenuClicked: false,
+    });
 
   useEffect(() => {
-    if (pageBlock.current !== null) {
-      if (prevNumber.current === 0) {
-        pageBlock.current.classList.add('main-start');
-        fNum.current.classList.add('number-out-start');
-        sNum.current.classList.add('number-in-start');
+    if (homePageMovingBlock.current !== null) {
+      if (pageSettings.prev === 0) {
+        homePageMovingBlock.current.classList.add('main-start');
+        firstFrontNumberRef.current.classList.add('number-out-start');
+        secondFrontNumberRef.current.classList.add('number-in-start');
       }
-      void pageBlock.current.offsetWidth;
-      pageBlock.current.classList.add('slide-in-main');
-      prevNumber.current = globalState.page;
+      void homePageMovingBlock.current.offsetWidth;
+
+      homePageMovingBlock.current.classList.add('slide-in-main');
     }
+
+    // If it does not work, move out of useEffect hook.
+    global.screen.orientation.lock('portrait').catch(() => {
+      console.log('I got you Captain! No orientation on this device :)');
+    });
 
     return () => {};
   });
+  console.log(pageSettings);
 
   const goToPage = (pNumber) => {
-    if (pNumber < globalState.page) {
-      if (pageBlock.current !== null && globalState.page !== pNumber) {
-        pageBlock.current.classList.remove('main-start');
-        void pageBlock.current.offsetWidth;
-        pageBlock.current.classList.add('slide-up-main');
+    if (pNumber < pageSettings.current) {
+      if (homePageMovingBlock.current !== null && pageSettings.current !== pNumber) {
+        homePageMovingBlock.current.classList.remove('main-start');
+        void homePageMovingBlock.current.offsetWidth;
+        homePageMovingBlock.current.classList.add('slide-up-main');
+
         setTimeout(() => {
-          dispatch(goTo({ page: pNumber, prev: prevNumber.current, menuClick: true }));
-          if (fNum.current !== null) {
-            fNum.current.classList.remove('number-out-start');
-            fNum.current.classList.remove('number-out-down');
-            fNum.current.classList.remove('number-out-up');
-            sNum.current.classList.remove('number-in-start');
-            sNum.current.classList.remove('number-in-down');
-            sNum.current.classList.remove('number-in-up');
+          setPageSettings({ current: pNumber, prev: pageSettings.current, isMenuClicked: true });
 
-            void fNum.current.offsetWidth;
-            void fNum.current.offsetWidth;
+          if (firstFrontNumberRef.current !== null) {
+            removeAllHTMLStyles(firstFrontNumberRef);
+            removeAllHTMLStyles(secondFrontNumberRef);
 
-            fNum.current.classList.add('number-out-down');
-            sNum.current.classList.add('number-in-down');
+            void firstFrontNumberRef.current.offsetWidth;
+            void firstFrontNumberRef.current.offsetWidth;
+
+            firstFrontNumberRef.current.classList.add('number-out-down');
+            secondFrontNumberRef.current.classList.add('number-in-down');
           }
         }, 500);
       }
     } else {
-      if (pageBlock.current !== null && globalState.page !== pNumber) {
-        pageBlock.current.classList.remove('main-start');
-        void pageBlock.current.offsetWidth;
-        pageBlock.current.classList.add('slide-down-main');
+      if (homePageMovingBlock.current !== null && pageSettings.current !== pNumber) {
+        homePageMovingBlock.current.classList.remove('main-start');
+        void homePageMovingBlock.current.offsetWidth;
+        homePageMovingBlock.current.classList.add('slide-down-main');
+
         setTimeout(() => {
-          dispatch(goTo({ page: pNumber, prev: prevNumber.current, menuClick: true }));
-          if (fNum.current !== null) {
-            fNum.current.classList.remove('number-out-start');
-            fNum.current.classList.remove('number-out-down');
-            fNum.current.classList.remove('number-out-up');
-            sNum.current.classList.remove('number-in-start');
-            sNum.current.classList.remove('number-in-down');
-            sNum.current.classList.remove('number-in-up');
+          setPageSettings({ current: pNumber, prev: pageSettings.current, isMenuClicked: true });
 
-            void fNum.current.offsetWidth;
-            void fNum.current.offsetWidth;
+          if (firstFrontNumberRef.current !== null) {
+            removeAllHTMLStyles(firstFrontNumberRef);
+            removeAllHTMLStyles(secondFrontNumberRef);
 
-            fNum.current.classList.add('number-out-up');
-            sNum.current.classList.add('number-in-up');
+            void firstFrontNumberRef.current.offsetWidth;
+            void firstFrontNumberRef.current.offsetWidth;
+
+            firstFrontNumberRef.current.classList.add('number-out-up');
+            secondFrontNumberRef.current.classList.add('number-in-up');
           }
         }, 500);
       }
@@ -89,26 +85,37 @@ function App() {
   };
 
   const onUpWheel = (e) => {
-    if (globalState.page > 1) {
-      if (pageBlock.current !== null) {
-        pageBlock.current.classList.remove('main-start');
-        void pageBlock.current.offsetWidth;
-        pageBlock.current.classList.add('slide-up-main');
+    if (pageSettings.current > 1) {
+      if (homePageMovingBlock.current !== null) {
+        homePageMovingBlock.current.classList.remove('main-start');
+        void homePageMovingBlock.current.offsetWidth;
+        homePageMovingBlock.current.classList.add('slide-up-main');
+
         setTimeout(() => {
-          dispatch(setPage({ page: globalState.page - 1, prev: prevNumber.current }));
-          if (fNum.current !== null) {
-            fNum.current.classList.remove('number-out-start');
-            fNum.current.classList.remove('number-out-down');
-            fNum.current.classList.remove('number-out-up');
-            sNum.current.classList.remove('number-in-start');
-            sNum.current.classList.remove('number-in-down');
-            sNum.current.classList.remove('number-in-up');
+          if (pageSettings.current === 4) {
+            setPageSettings({
+              ...pageSettings,
+              current: pageSettings.current - 1,
+              prev: pageSettings.current,
+              isMenuClicked: false,
+            });
+          } else {
+            setPageSettings({
+              ...pageSettings,
+              current: pageSettings.current - 1,
+              prev: pageSettings.current,
+            });
+          }
 
-            void fNum.current.offsetWidth;
-            void fNum.current.offsetWidth;
+          if (firstFrontNumberRef.current !== null) {
+            removeAllHTMLStyles(firstFrontNumberRef);
+            removeAllHTMLStyles(secondFrontNumberRef);
 
-            fNum.current.classList.add('number-out-down');
-            sNum.current.classList.add('number-in-down');
+            void firstFrontNumberRef.current.offsetWidth;
+            void firstFrontNumberRef.current.offsetWidth;
+
+            firstFrontNumberRef.current.classList.add('number-out-down');
+            secondFrontNumberRef.current.classList.add('number-in-down');
           }
         }, 500);
       }
@@ -116,26 +123,37 @@ function App() {
   };
 
   const onDownWheel = (e) => {
-    if (globalState.page < 4) {
-      if (pageBlock.current !== null) {
-        pageBlock.current.classList.remove('main-start');
-        void pageBlock.current.offsetWidth;
-        pageBlock.current.classList.add('slide-down-main');
+    if (pageSettings.current < 4) {
+      if (homePageMovingBlock.current !== null) {
+        homePageMovingBlock.current.classList.remove('main-start');
+        void homePageMovingBlock.current.offsetWidth;
+        homePageMovingBlock.current.classList.add('slide-down-main');
+
         setTimeout(() => {
-          dispatch(setPage({ page: globalState.page + 1, prev: prevNumber.current }));
-          if (fNum.current !== null) {
-            fNum.current.classList.remove('number-out-start');
-            fNum.current.classList.remove('number-out-down');
-            fNum.current.classList.remove('number-out-up');
-            sNum.current.classList.remove('number-in-start');
-            sNum.current.classList.remove('number-in-down');
-            sNum.current.classList.remove('number-in-up');
+          if (pageSettings.current === 3) {
+            setPageSettings({
+              ...pageSettings,
+              current: pageSettings.current + 1,
+              prev: pageSettings.current,
+              isMenuClicked: true,
+            });
+          } else {
+            setPageSettings({
+              ...pageSettings,
+              current: pageSettings.current + 1,
+              prev: pageSettings.current,
+            });
+          }
 
-            void fNum.current.offsetWidth;
-            void fNum.current.offsetWidth;
+          if (firstFrontNumberRef.current !== null) {
+            removeAllHTMLStyles(firstFrontNumberRef);
+            removeAllHTMLStyles(secondFrontNumberRef);
 
-            fNum.current.classList.add('number-out-up');
-            sNum.current.classList.add('number-in-up');
+            void firstFrontNumberRef.current.offsetWidth;
+            void firstFrontNumberRef.current.offsetWidth;
+
+            firstFrontNumberRef.current.classList.add('number-out-up');
+            secondFrontNumberRef.current.classList.add('number-in-up');
           }
         }, 500);
       }
@@ -147,10 +165,11 @@ function App() {
       <Switch>
         <Route path="/" exact>
           <MainPage
-            globalState={globalState}
-            fNum={fNum}
-            sNum={sNum}
-            pageBlock={pageBlock}
+            pageSettings={pageSettings}
+            setPageSettings={setPageSettings}
+            firstFrontNumberRef={firstFrontNumberRef}
+            secondFrontNumberRef={secondFrontNumberRef}
+            pageBlock={homePageMovingBlock}
             goToPage={goToPage}
             onDownWheel={onDownWheel}
           />

@@ -1,22 +1,38 @@
 import React from 'react';
 import { Counter, FrontHeader, LoadingScreen, Page1, Page2, Page3, Page4 } from '../components';
 
-function MainPage({ globalState, goToPage, fNum, sNum, pageBlock, onDownWheel }) {
+function MainPage({
+  pageSettings,
+  setPageSettings,
+  goToPage,
+  firstFrontNumberRef,
+  secondFrontNumberRef,
+  pageBlock,
+  onDownWheel,
+}) {
   return (
     <main className={'front-bg'}>
-      {globalState.page === 1 && globalState.prev === 0 && <LoadingScreen />}
+      {pageSettings.current === 1 && pageSettings.prev === 0 && <LoadingScreen />}
       <section>
-        <FrontHeader globalState={globalState} goToPage={goToPage} />
+        <FrontHeader
+          pageSettings={pageSettings}
+          setPageSettings={setPageSettings}
+          goToPage={goToPage}
+        />
 
-        {globalState.page === 1 && <Page1 pageBlock={pageBlock} onDownWheel={onDownWheel} />}
+        {pageSettings.current === 1 && <Page1 pageBlock={pageBlock} onDownWheel={onDownWheel} />}
 
-        {globalState.page === 2 && <Page2 pageBlock={pageBlock} />}
+        {pageSettings.current === 2 && <Page2 pageBlock={pageBlock} />}
 
-        {globalState.page === 3 && <Page3 pageBlock={pageBlock} />}
+        {pageSettings.current === 3 && <Page3 pageBlock={pageBlock} />}
 
-        {globalState.page === 4 && <Page4 pageBlock={pageBlock} />}
+        {pageSettings.current === 4 && <Page4 pageBlock={pageBlock} />}
 
-        <Counter pageNumber={globalState.page} fNum={fNum} sNum={sNum} />
+        <Counter
+          pageNumber={pageSettings.current}
+          firstFrontNumberRef={firstFrontNumberRef}
+          secondFrontNumberRef={secondFrontNumberRef}
+        />
       </section>
       <aside>
         <a href="https://www.facebook.com/roma.caldare/" className="facebook-icon">

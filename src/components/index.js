@@ -11,3 +11,5 @@ export { default as Page2 } from './main/Page2';
 export { default as Page3 } from './main/Page3';
 export { default as Page4 } from './main/Page4';
 export { default as Counter } from './main/Counter';
+
+export { default as AbilityBar } from './about/AbilityBar';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useEffect, useRef } from 'react';
 
-function Counter({ pageNumber, fNum, sNum }) {
+function Counter({ pageNumber, firstFrontNumberRef, secondFrontNumberRef }) {
   const prevNumber = useRef(0);
   useEffect(() => {
     prevNumber.current = pageNumber;
@@ -10,8 +10,17 @@ function Counter({ pageNumber, fNum, sNum }) {
 
   return (
     <div className="page-number number-start">
-      0{<span ref={fNum}>{prevNumber.current}</span>}
-      {<span ref={sNum}>{pageNumber}</span>}
+      <p>0</p>
+      {
+        <span className="number-out-link-back" ref={firstFrontNumberRef}>
+          {prevNumber.current}
+        </span>
+      }
+      {
+        <span className="number-in-link-back" ref={secondFrontNumberRef}>
+          {pageNumber}
+        </span>
+      }
     </div>
   );
 }
